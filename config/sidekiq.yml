@@ -1,0 +1,11 @@
+:concurrency: 5
+:queues:
+  - default
+
+:scheduler:
+  :schedule:
+    fetch_earthquake_data:
+      # cron: "0 * * * *" # Cada hora
+      cron: "*/5 * * * *" # Cada 10 minutos
+      class: "FetchEarthquakeDataJob"
+

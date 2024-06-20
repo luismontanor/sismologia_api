@@ -1,0 +1,39 @@
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: sismologia_api_development
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:6.2
+    ports:
+      - "6379:6379"
+
+  web:
+    build: .
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -b '0.0.0.0'"
+    volumes:
+      - .:/sismologia_api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - redis
+
+  sidekiq:
+    build: .
+    command: bundle exec sidekiq -C config/sidekiq.yml
+    volumes:
+      - .:/sismologia_api
+    depends_on:
+      - db
+      - redis
+
+volumes:
+  db_data:
